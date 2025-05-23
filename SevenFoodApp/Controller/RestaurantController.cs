@@ -13,10 +13,10 @@ namespace SevenFoodApp.Controller
     internal class RestaurantController
     {
         RestaurantRepository repository = new RestaurantRepository(CONTEXT.RESTAURANT);
-        public bool Add(string name)
+        public bool Add(RestaurantRequestDTO resDTO)
         {
             int id = this.GetNextId();
-            Restaurant restaurant = new Restaurant(id, name);
+            Restaurant restaurant = new Restaurant(id, resDTO.Name);
             return repository.Insert(restaurant);
         }
 
@@ -25,23 +25,32 @@ namespace SevenFoodApp.Controller
             return Please.GetNextId();
         }
 
-        public List<Dictionary<string, string>>? getAll()
+        public List<RestaurantResponseDTO>? getAll()
         {
 
             List<Restaurant> restaurants = repository.GetAll();
 
             if (restaurants != null && restaurants.Count() > 0)
             {
-                var restaurantsString = new List<Dictionary<string, string>>();
+                var restaurantsDTO = new List<RestaurantResponseDTO>();
 
                 foreach (var restaurant in restaurants)
                 {
-                    var userString = this.castObjectToDictionary(restaurant);
-                    restaurantsString.Add(userString);
+                    var restaurantDTO = this.castToDTO(restaurant);
+                    restaurantsDTO.Add(restaurantDTO);
                 }
-                return restaurantsString;
+                return restaurantsDTO;
             }
             return null;
+        }
+        private RestaurantResponseDTO castToDTO(Restaurant res)
+        {
+            RestaurantResponseDTO resDTO = new RestaurantResponseDTO();
+            resDTO.Id = res.Id;
+            resDTO.Name = res.Name;
+            resDTO.Active = res.Active;
+
+            return resDTO;
         }
 
         public Dictionary<string, string>? getById(int id)

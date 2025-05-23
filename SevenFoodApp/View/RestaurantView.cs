@@ -14,7 +14,7 @@ namespace SevenFoodApp.View
     internal class RestaurantView : IView
     {
         RestaurantController controller = new RestaurantController();
-        
+        public RestaurantRequestDTO restaurantrDTO = new RestaurantRequestDTO();
         public void Add()
         {
             try
@@ -22,8 +22,9 @@ namespace SevenFoodApp.View
                 Console.WriteLine("CADASTRAR NOVO RESTAURANTE\n");
                 Console.Write("Nome: ");
                 string name = Please.ConsoleRead() ?? "Nome não Informado";
+                restaurantrDTO.Name = name;
 
-                if (this.controller.Add(name))
+                if (this.controller.Add(restaurantrDTO))
                     Console.WriteLine("Restaurante Cadastrado com sucesso.");
                 else
                     Console.WriteLine(Please.GetMessageGenericError());
@@ -97,7 +98,7 @@ namespace SevenFoodApp.View
 
             if (objs != null && objs.Count() > 0)
             {
-                foreach (Dictionary<string, string> obj in objs)
+                foreach (RestaurantResponseDTO obj in objs)
                 {
                     this.ShowInLine(obj);
                 }
@@ -152,11 +153,11 @@ namespace SevenFoodApp.View
             }
         }
 
-        private void ShowInLine(Dictionary<string, string> obj)
+        private void ShowInLine(RestaurantResponseDTO obj)
         {
-            Console.Write($"{obj["id"].ToString().PadRight((int)SIZE.FIVE)}");
-            Console.Write($"{obj["name"].PadRight((int)SIZE.THIRTY)[..((int)SIZE.THIRTY - 1)]} ");
-            Console.Write($"{obj["active"].PadRight((int)SIZE.FIFTEEN)}");
+            Console.Write($"{obj.Id.ToString().PadRight((int)SIZE.FIVE)}");
+            Console.Write($"{obj.Name.ToString().PadRight((int)SIZE.THIRTY)[..((int)SIZE.THIRTY - 1)]} ");
+            Console.Write($"{obj.Active.ToString().PadRight((int)SIZE.FIFTEEN)}");
             Console.WriteLine("");
         }
 

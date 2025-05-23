@@ -13,7 +13,7 @@ namespace SevenFoodApp.View
     internal class FoodView : IView
     {
         FoodController controller = new FoodController();
-
+        public FoodRequestDTO frDTO = new FoodRequestDTO();
         public void Add()
         {
             try
@@ -21,15 +21,18 @@ namespace SevenFoodApp.View
                 Console.WriteLine("CADASTRAR NOVA COMIDA\n");
                 Console.Write("Descrição: ");
                 string description = Please.ConsoleRead() ?? "Nome não Informado";
+                frDTO.Description = description;
 
                 Console.Write("Preço: ");
                 double price = double.Parse(Please.ConsoleRead() ?? "0,0");
+                frDTO.Price = price;
 
                 Console.Write("Restaurante: ");
                 int idRestaurant = int.Parse(Please.ConsoleRead() ?? "0");
+                frDTO.Id = idRestaurant;
 
 
-                if (this.controller.Add(description, price, idRestaurant))
+                if (this.controller.Add(frDTO))
                     Console.WriteLine("Comida Cadastrada com sucesso.");
                 else
                     Console.WriteLine(Please.GetMessageGenericError());
@@ -66,7 +69,7 @@ namespace SevenFoodApp.View
 
             if (objs != null && objs.Count() > 0)
             {
-                foreach (Dictionary<string, string> obj in objs)
+                foreach (FoodResponseDTO obj in objs)
                 {
                     this.ShowInLine(obj);
                 }
@@ -112,13 +115,13 @@ namespace SevenFoodApp.View
 
         }
 
-        private void ShowInLine(Dictionary<string, string> obj)
+        private void ShowInLine(FoodResponseDTO obj)
         {
-            Console.Write($"{obj["id"].ToString().PadRight((int)SIZE.FIVE)}");
-            Console.Write($"{obj["description"].PadRight((int)SIZE.THIRTY)[..((int)SIZE.THIRTY - 1)]} ");
-            Console.Write($"{obj["price"].PadRight((int)SIZE.FIFTEEN)}");
-            Console.Write($"{obj["status"].PadRight((int)SIZE.TEN)}");
-            Console.Write($"{obj["restaurant"].PadRight((int)SIZE.TWENTY)}");
+            Console.Write($"{obj.Id.ToString().PadRight((int)SIZE.FIVE)}");
+            Console.Write($"{obj.Description.PadRight((int)SIZE.THIRTY)[..((int)SIZE.THIRTY - 1)]} ");
+            Console.Write($"{obj.Price.ToString().PadRight((int)SIZE.FIFTEEN)}");
+            Console.Write($"{obj.Status.ToString().PadRight((int)SIZE.TEN)}");
+            Console.Write($"{obj.Restaurant.ToString().PadRight((int)SIZE.TWENTY)}");
             Console.WriteLine("");
         }
 

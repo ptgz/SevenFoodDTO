@@ -1,6 +1,7 @@
 ﻿using SevenFoodApp.Controller;
 using SevenFoodApp.Interfaces;
 using SevenFoodApp.Model;
+using SevenFoodApp.Repository;
 using SevenFoodApp.Util;
 using static SevenFoodApp.Util.Enums;
 
@@ -10,6 +11,7 @@ namespace SevenFoodApp.View
     internal class UserView : IView
     {
         private UserController controller = new UserController();
+        private UserRequestDTO userrDTO = new UserRequestDTO();
 
         public void Add()
         {
@@ -18,9 +20,14 @@ namespace SevenFoodApp.View
                 Console.WriteLine("CADASTRAR NOVO USUÁRIO\n");
                 Console.Write("Nome: ");
                 string name = Please.ConsoleRead() ?? "Nome não Informado";
+                userrDTO.Name = name;
+                userrDTO.Type = TYPE_USER.Client;
 
-                if (this.controller.Add(name, TYPE_USER.Client))
-                    Console.WriteLine("Usuario Cadastrado com sucesso.");
+                var action = this.controller.Add(userrDTO);
+                
+                if (action.Id != -1) {
+                    Console.WriteLine($"Olá {name}, sua senha é {action.Password}");
+                }
                 else
                     Console.WriteLine(Please.GetMessageGenericError());
             }
@@ -93,7 +100,7 @@ namespace SevenFoodApp.View
 
             if (objs != null && objs.Count() > 0)
             {
-                foreach (Dictionary<string, string> obj in objs)
+                foreach (UserResponseDTO obj in objs)
                 {
                     this.ShowInLine(obj);
                 }
@@ -144,12 +151,12 @@ namespace SevenFoodApp.View
             }
         }
 
-        private void ShowInLine(Dictionary<string, string> obj)
+        private void ShowInLine(UserResponseDTO obj)
         {
-            Console.Write($"{obj["id"].ToString().PadRight((int)SIZE.FIVE)}");
-            Console.Write($"{obj["name"].PadRight((int)SIZE.THIRTY)[..((int)SIZE.THIRTY - 1)]} ");
-            Console.Write($"{obj["password"].PadRight((int)SIZE.FIFTEEN)}");
-            Console.Write($"{obj["type"].ToString().PadRight((int)SIZE.TWENTY)}");
+            Console.Write($"{obj.Id.ToString().PadRight((int)SIZE.FIVE)}");
+            Console.Write($"{obj.Name.PadRight((int)SIZE.THIRTY)[..((int)SIZE.THIRTY - 1)]} ");
+            Console.Write($"{obj.Password.PadRight((int)SIZE.FIFTEEN)}");
+            Console.Write($"{obj.Type.ToString().PadRight((int)SIZE.TWENTY)}");
             Console.WriteLine("");
         }
 

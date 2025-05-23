@@ -9,12 +9,28 @@ namespace SevenFoodApp.Controller
     {
         private UserRepository userRepository = new UserRepository(CONTEXT.USER);
 
-        public bool Add(string name, TYPE_USER type)
+        public UserResponseDTO Add(UserRequestDTO userDTO)
         {
             int id = this.GetNextId();
             string password = this.BuilderRandomPassword();
-            User user = new User(id, name, password, type);
-            return userRepository.Insert(user);
+            User user = new User(id, userDTO.Name, password, userDTO.Type);
+            if (userRepository.Insert(user))
+            {
+                UserResponseDTO responseDTO = new UserResponseDTO();
+                responseDTO.Id = id;
+                responseDTO.Name = userDTO.Name;
+                responseDTO.Password = password;
+                responseDTO.Type = userDTO.Type;
+
+                return responseDTO;
+
+            } else
+            {
+                UserResponseDTO responseDTO = new UserResponseDTO();
+                responseDTO.Id = -1;
+
+                return responseDTO;
+            }
         }
 
         private string BuilderRandomPassword()
@@ -45,21 +61,22 @@ namespace SevenFoodApp.Controller
             return Please.GetNextId();
         }
 
-        public List<Dictionary<string, string>>? getAll()
+        private UserResponseDTO userResDTO = new UserResponseDTO();
+        public List<UserResponseDTO>? getAll()
         {
 
             List<User> users = userRepository.GetAll();
 
             if (users != null && users.Count() > 0)
             {
-                var usersString = new List<Dictionary<string, string>>();
+                var usersDto = new List<UserResponseDTO>();
 
                 foreach (var user in users)
                 {
-                    var userString = this.castObjectToDictionary(user); ;
-                    usersString.Add(userString);
+                    var userDto = this.castToDTO(user);
+                    usersDto.Add(userDto);
                 }
-                return usersString;
+                return usersDto;
             }
             return null;
         }
@@ -96,6 +113,18 @@ namespace SevenFoodApp.Controller
             }
 
         }
+
+        private UserResponseDTO castToDTO(User user)
+        {
+            UserResponseDTO responseDTO = new UserResponseDTO();
+            responseDTO.Id = user.Id;
+            responseDTO.Name = user.Name;
+            responseDTO.Password = user.Password.Substring(0, 3) + "******";
+            responseDTO.Type = user.Type;
+
+            return responseDTO;
+        }
+
 
         private Dictionary<string, string> castObjectToDictionary(User user)
         {

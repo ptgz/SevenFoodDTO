@@ -15,18 +15,17 @@ namespace SevenFoodApp.Controller
         FoodRepository repository = new FoodRepository(CONTEXT.FOOD);
         RestaurantRepository restaurantRepository = new RestaurantRepository(CONTEXT.RESTAURANT);
 
-        public bool Add(string name, double price, int idRestaurant)
+        public bool Add(FoodRequestDTO fDTO)
         {
             try
             {
                 int id = this.GetNextId();
-                Restaurant? restaurant = this.restaurantRepository.GetById(idRestaurant);
+                Restaurant? restaurant = this.restaurantRepository.GetById(fDTO.Id);
                 if (restaurant == null)
                 {
                     throw new Exception("Restaurant Inexistente");
                 }
-
-                Food food = new Food(id, name, price, restaurant);
+                Food food = new Food(id, fDTO.Description, fDTO.Price, restaurant);
                 return repository.Insert(food);
             }
             catch (Exception ex)
@@ -41,23 +40,35 @@ namespace SevenFoodApp.Controller
             return Please.GetNextId();
         }
 
-        public List<Dictionary<string, string>>? getAll()
+        public List<FoodResponseDTO>? getAll()
         {
 
-            List<Food> restaurants = repository.GetAll();
+            List<Food> foods = repository.GetAll();
 
-            if (restaurants != null && restaurants.Count() > 0)
+
+            if (foods != null && foods.Count() > 0)
             {
-                var restaurantsString = new List<Dictionary<string, string>>();
+                var foodsDTO = new List<FoodResponseDTO>();
 
-                foreach (var food in restaurants)
+                foreach (var food in foods)
                 {
-                    var userString = this.castObjectToDictionary(food);
-                    restaurantsString.Add(userString);
+                    var foodDTO = this.castToDTO(food);
+                    foodsDTO.Add(foodDTO);
                 }
-                return restaurantsString;
+                return foodsDTO;
             }
             return null;
+        }
+
+        private FoodResponseDTO castToDTO(Food food)
+        {
+            FoodResponseDTO foodDTO = new FoodResponseDTO();
+            foodDTO.Id = food.Id;
+            foodDTO.Description = food.Description;
+            foodDTO.Price = food.Price;
+            foodDTO.Restaurant = food.Restaurant;
+
+            return foodDTO;
         }
 
         public Dictionary<string, string>? getById(int id)
